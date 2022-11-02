@@ -34,13 +34,7 @@ namespace MiniBlog.Controllers
         [HttpPut]
         public User Update(User user)
         {
-            var foundUser = _userStore.GetAll().FirstOrDefault(_ => _.Name == user.Name);
-            if (foundUser != null)
-            {
-                foundUser.Email = user.Email;
-            }
-
-            return foundUser;
+            return userService.UpdateUserInfo(user);
         }
 
         [HttpDelete]
