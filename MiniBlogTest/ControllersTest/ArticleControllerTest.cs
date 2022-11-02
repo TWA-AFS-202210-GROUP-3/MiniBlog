@@ -16,8 +16,6 @@
         private IArticleStore articleStore = new ArticleContext();
         public ArticleControllerTest()
         {
-            UserStoreWillReplaceInFuture.Instance.Init();
-            ArticleStoreWillReplaceInFuture.Instance.Init();
             articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
             articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }

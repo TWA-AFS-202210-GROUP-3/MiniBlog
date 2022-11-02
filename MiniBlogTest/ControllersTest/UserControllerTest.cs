@@ -17,8 +17,6 @@ namespace MiniBlogTest.ControllerTest
             : base()
 
         {
-            UserStoreWillReplaceInFuture.Instance.Init();
-            ArticleStoreWillReplaceInFuture.Instance.Init();
         }
 
         [Fact]
