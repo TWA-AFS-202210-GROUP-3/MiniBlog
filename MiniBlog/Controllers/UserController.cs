@@ -28,7 +28,7 @@ namespace MiniBlog.Controllers
         [HttpGet]
         public List<User> GetAll()
         {
-            return _userStore.GetAll();
+            return userService.GetAllUsers();
         }
 
         [HttpPut]
