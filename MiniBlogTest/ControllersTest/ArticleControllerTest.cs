@@ -60,7 +60,6 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async void Should_create_article_and_register_user_correct()
         {
-            GetClient();
             var client = GetClient();
             string userNameWhoWillAdd = "Tom";
             string articleContent = "What a good day today!";
@@ -96,7 +95,7 @@ namespace MiniBlogTest.ControllerTest
             var factory = new WebApplicationFactory<Program>();
             return factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleService));
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleStore));
             }).CreateClient();
         }
 
