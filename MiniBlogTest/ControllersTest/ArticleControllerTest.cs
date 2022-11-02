@@ -17,7 +17,6 @@ namespace MiniBlogTest.ControllerTest
         private IArticleStore articleStore = new ArticleStoreContext();
         public ArticleControllerTest()
         {
-            UserStoreWillReplaceInFuture.Instance.Init();
             articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
             articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }
@@ -60,7 +59,6 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async void Should_create_article_and_register_user_correct()
         {
-            GetClient();
             var client = GetClient();
             string userNameWhoWillAdd = "Tom";
             string articleContent = "What a good day today!";
