@@ -3,7 +3,7 @@ using MiniBlog.Stores;
 
 public class ArticleStoreContext: IArticleStore
 {
-    private List<Article> articles;
+    private List<Article> articles = new List<Article>();
 
     public Article Save(Article article)
     {

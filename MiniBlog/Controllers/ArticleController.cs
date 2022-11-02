@@ -20,7 +20,7 @@
         [HttpGet]
         public List<Article> List()
         {
-            return ArticleStoreWillReplaceInFuture.Instance.GetAll();
+            return article.GetAll();
         }
 
         [HttpPost]
