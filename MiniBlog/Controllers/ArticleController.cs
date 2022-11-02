@@ -13,12 +13,10 @@ namespace MiniBlog.Controllers
     public class ArticleController : ControllerBase
     {
         // dependency injection
-        private readonly IArticleStore _articleStore;
         private readonly IArticleServices _artickeServices;
 
-        public ArticleController(IArticleStore articleStore, IArticleServices artickeServices)
+        public ArticleController(IArticleServices artickeServices)
         {
-            this._articleStore = articleStore;
             this._artickeServices = artickeServices;
         }
 

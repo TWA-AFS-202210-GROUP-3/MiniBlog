@@ -1,6 +1,7 @@
 using MiniBlog.Model;
 using MiniBlog.Stores;
 using Microsoft.AspNetCore.Mvc;
+using MiniBlog.Services;
 
 namespace MiniBlog.Controllers
 {
@@ -10,65 +11,47 @@ namespace MiniBlog.Controllers
     {
         // dependency injection
         private readonly IArticleStore _articleStore;
+        private IUserServices _userServices;
         private readonly IUserStore _userStore;
+    
 
-        public UserController(IArticleStore articleStore, IUserStore userStore)
+        public UserController(IArticleStore articleStore, IUserStore userStore,IUserServices userServices)
         {
             _articleStore = articleStore;
             _userStore = userStore;
+            _userServices = userServices;
         }
 
         [HttpPost]
         public ActionResult<User> Register(User user)
         {
-            if (!_userStore.GetAll().Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
-            {
-                _userStore.Save(user);
-            }
-
-            return new CreatedResult("/user", user);
+            return new CreatedResult("/user", _userServices.Register(user));
         }
 
         [HttpGet]
         public List<User> GetAll()
         {
-            return _userStore.GetAll();
+            return _userServices.GetAll();
         }
 
         [HttpPut]
         public User Update(User user)
         {
-            var foundUser = _userStore.GetAll().FirstOrDefault(_ => _.Name == user.Name);
-            if (foundUser != null)
-            {
-                foundUser.Email = user.Email;
-            }
 
-            return foundUser;
+            return _userServices.Update(user);
         }
 
         [HttpDelete]
         public User Delete(string name)
         {
-            var foundUser = _userStore.GetAll().FirstOrDefault(_ => _.Name == name);
-            if (foundUser != null)
-            {
-                _userStore.Delete(foundUser);
-                var articles = _articleStore.GetAll()
-                    .Where(article => article.UserName == foundUser.Name)
-                    .ToList();
-                articles.ForEach(article => _articleStore.Delete(article));
-            }
 
-            return foundUser;
+            return _userServices.Delete(name);
         }
 
         [HttpGet("{name}")]
         public User GetByName(string name)
         {
-            return _userStore.GetAll().FirstOrDefault(_ =>
-                string.Equals(_.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new
-                InvalidOperationException();
+            return _userServices.GetByName(name);
         }
     }
 }
