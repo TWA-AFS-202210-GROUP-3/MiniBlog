@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IArticleStore, ArticleContext>();
 builder.Services.AddSingleton<IUserStore, UserStoreContext>();
 builder.Services.AddSingleton<ArticleService>();
+builder.Services.AddSingleton<UserService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
