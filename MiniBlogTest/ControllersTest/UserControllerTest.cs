@@ -1,3 +1,5 @@
+using Moq;
+
 namespace MiniBlogTest.ControllerTest
 {
     using System.Net;
@@ -56,7 +58,7 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
-            var client = GetClient();
+            var client = MockArticleHttpClient();
 
             var userName = "Tom";
             var email = "a@b.com";
@@ -145,6 +147,17 @@ namespace MiniBlogTest.ControllerTest
         {
             var factory = new WebApplicationFactory<Program>();
             return factory.CreateClient();
+        }
+
+        private static HttpClient MockArticleHttpClient()
+        {
+            var userStoreMock = new Mock<IUserStore>();
+            userStoreMock.Setup(store => store.Save(It.IsAny<User>())).Throws<Exception>();
+            var factory = new WebApplicationFactory<Program>();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => userStoreMock.Object));
+            }).CreateClient();
         }
     }
 }
