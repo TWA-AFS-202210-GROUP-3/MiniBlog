@@ -7,6 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IArticleStore, ArticleStoreContext>();
 builder.Services.AddSingleton<IUserStore, UserStoreContext>();
 builder.Services.AddSingleton<ArticalService>();
+builder.Services.AddSingleton<UserService>();
 /// <summary>
 /// 需要IArticleStore的时候，给一个ArticleStoreContext，且是Singleton的
 /// </summary>

@@ -3,7 +3,7 @@ using MiniBlog.Model;
 
 namespace MiniBlog.Stores
 {
-    public class UserService : IArticalService
+    public class UserService : IUserService
     {
         private IArticleStore articleStore;
         private IUserStore userStore;
@@ -38,6 +38,28 @@ namespace MiniBlog.Stores
             }
 
             return foundUser;
+        }
+
+        public User Delete(string name)
+        {
+            var foundUser = userStore.GetAll().FirstOrDefault(_ => _.Name == name);
+            if (foundUser != null)
+            {
+                this.userStore.Delete(foundUser);
+                var articles = this.articleStore.GetAll()
+                    .Where(article => article.UserName == foundUser.Name)
+                    .ToList();
+                articles.ForEach(article => this.articleStore.Delete(article));
+            }
+
+            return foundUser;
+        }
+
+        public User GetByName(string name)
+        {
+            return userStore.GetAll().FirstOrDefault(_ =>
+                string.Equals(_.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new
+                InvalidOperationException();
         }
     }
 }

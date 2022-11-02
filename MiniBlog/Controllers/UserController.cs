@@ -32,43 +32,50 @@ namespace MiniBlog.Controllers
         [HttpGet]
         public List<User> GetAll()
         {
-            return this.userStore.GetAll();
+            List<User> all = this.userService.GetAll();
+            return all;
+            //return this.userStore.GetAll();
         }
 
         [HttpPut]
         public User Update(User user)
         {
-            var foundUser = userStore.GetAll().FirstOrDefault(_ => _.Name == user.Name);
-            if (foundUser != null)
-            {
-                foundUser.Email = user.Email;
-            }
-
+            var foundUser = this.userService.Update(user);
             return foundUser;
+            //var foundUser = userStore.GetAll().FirstOrDefault(_ => _.Name == user.Name);
+            //if (foundUser != null)
+            //{
+            //    foundUser.Email = user.Email;
+            //}
+
+            //return foundUser;
         }
 
         [HttpDelete]
         public User Delete(string name)
         {
-            var foundUser = userStore.GetAll().FirstOrDefault(_ => _.Name == name);
-            if (foundUser != null)
-            {
-                this.userStore.Delete(foundUser);
-                var articles = this.articleStore.GetAll()
-                    .Where(article => article.UserName == foundUser.Name)
-                    .ToList();
-                articles.ForEach(article => this.articleStore.Delete(article));
-            }
-
+            var foundUser = this.userService.Delete(name);
             return foundUser;
+            //var foundUser = userStore.GetAll().FirstOrDefault(_ => _.Name == name);
+            //if (foundUser != null)
+            //{
+            //    this.userStore.Delete(foundUser);
+            //    var articles = this.articleStore.GetAll()
+            //        .Where(article => article.UserName == foundUser.Name)
+            //        .ToList();
+            //    articles.ForEach(article => this.articleStore.Delete(article));
+            //}
+
+            //return foundUser;
         }
 
         [HttpGet("{name}")]
         public User GetByName(string name)
         {
-            return userStore.GetAll().FirstOrDefault(_ =>
-                string.Equals(_.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new
-                InvalidOperationException();
+            return this.userService.GetByName(name);
+            //return userStore.GetAll().FirstOrDefault(_ =>
+            //    string.Equals(_.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new
+            //    InvalidOperationException();
         }
     }
 }
