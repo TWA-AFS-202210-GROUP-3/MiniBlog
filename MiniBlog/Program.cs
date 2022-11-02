@@ -1,8 +1,14 @@
+using MiniBlog.Stores;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IArticleStore, ArticleStoreContext>();
+/// <summary>
+/// 需要IArticleStore的时候，给一个ArticleStoreContext，且是Singleton的
+/// </summary>
+/// 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

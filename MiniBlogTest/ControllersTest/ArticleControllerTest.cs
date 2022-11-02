@@ -1,4 +1,6 @@
-﻿namespace MiniBlogTest.ControllerTest
+﻿using Moq;
+
+namespace MiniBlogTest.ControllerTest
 {
     using System.Net;
     using System.Net.Mime;
@@ -12,6 +14,8 @@
     [Collection("IntegrationTest")]
     public class ArticleControllerTest
     {
+        private IArticleStore articleStore = new ArticleStoreContext();
+
         public ArticleControllerTest()
         {
             UserStoreWillReplaceInFuture.Instance.Init();
@@ -32,7 +36,14 @@
         [Fact]
         public async void Should_create_article_fail_when_ArticleStore_unavailable()
         {
-            var client = GetClient();
+            var articleStoreMOcker = new Mock<IArticleStore>();
+            articleStoreMOcker.Setup(x => x.Save(It.IsAny<Article>())).Throws<Exception>();
+            var factory = new WebApplicationFactory<Program>();
+            var client = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service =>
+                    service.AddSingleton(serviceProvider => articleStoreMOcker.Object));
+            }).CreateClient();
             string userNameWhoWillAdd = "Tom";
             string articleContent = "What a good day today!";
             string articleTitle = "Good day";
@@ -78,10 +89,15 @@
             Assert.Equal("anonymous@unknow.com", users[0].Email);
         }
 
-        private static HttpClient GetClient()
+        private HttpClient GetClient()
         {
             var factory = new WebApplicationFactory<Program>();
-            return factory.CreateClient();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service =>
+                    service.AddSingleton(serviceProvider => articleStore));
+            }).CreateClient();
+            ///使用的是注入的articlestore
         }
     }
 }
