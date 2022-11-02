@@ -5,6 +5,7 @@
     using System.Text;
     using Microsoft.AspNetCore.Mvc.Testing;
     using MiniBlog.Model;
+    using MiniBlog.Services;
     using MiniBlog.Stores;
     using Moq;
     using Newtonsoft.Json;
@@ -14,7 +15,6 @@
     public class ArticleControllerTest
     {
         private IArticleStore articleStore = new ArticleStoreContext();
-        private IUserStore userStore = new UserStoreContext();
 
         public ArticleControllerTest()
         {
@@ -98,7 +98,6 @@
                 builder.ConfigureServices(services =>
                 {
                     services.AddSingleton(ServiceProvider => articleStore);
-                    services.AddSingleton(ServiceProvider => userStore);
                 });
             }).CreateClient();
         }

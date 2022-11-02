@@ -4,49 +4,36 @@
     using System.Collections.Generic;
     using Microsoft.AspNetCore.Mvc;
     using MiniBlog.Model;
+    using MiniBlog.Services;
     using MiniBlog.Stores;
 
     [ApiController]
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
-        private IArticleStore articleStore;
-        private IUserStore userStore;
+        private IArticleService articleService;
 
-        public ArticleController(IArticleStore articleStore, IUserStore userStore)
+        public ArticleController(IArticleService articleService)
         {
-            this.articleStore = articleStore;
-            this.userStore = userStore;
+            this.articleService = articleService;
         }
 
         [HttpGet]
         public List<Article> List()
         {
-            return articleStore.GetAll();
+            return this.articleService.GetAll();
         }
 
         [HttpPost]
         public ActionResult<Article> Create(Article article)
         {
-            if (article.UserName != null)
-            {
-                if (!userStore.GetAll().Exists(_ => article.UserName == _.Name))
-                {
-                    userStore.Save(new User(article.UserName));
-                }
-
-                articleStore.Save(article);
-            }
-
-            return new CreatedResult($"[controller]/{article.Id}", article);
+            return new CreatedResult($"[controller]/{article.Id}", this.articleService.Create(article));
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle =
-                articleStore.GetAll().FirstOrDefault(article => article.Id == id);
-            return foundArticle;
+            return this.articleService.GetById(id);
         }
     }
 }
