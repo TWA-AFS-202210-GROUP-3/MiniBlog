@@ -14,13 +14,9 @@ namespace MiniBlogTest.ControllerTest
     [Collection("IntegrationTest")]
     public class UserControllerTest
     {
-        private IArticleStore articleStore = new ArticleStoreContext();
-
         public UserControllerTest()
             : base()
         {
-            articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
-            articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }
 
         [Fact]

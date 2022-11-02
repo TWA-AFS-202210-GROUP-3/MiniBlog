@@ -1,4 +1,6 @@
-﻿namespace MiniBlog.Controllers
+﻿using MiniBlog.Services;
+
+namespace MiniBlog.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -12,41 +14,31 @@
     {
         // dependency injection
         private readonly IArticleStore _articleStore;
+        private readonly IArticleServices _artickeServices;
 
-        public ArticleController(IArticleStore articleStore)
+        public ArticleController(IArticleStore articleStore, IArticleServices artickeServices)
         {
             this._articleStore = articleStore;
+            this._artickeServices = artickeServices;
         }
 
         [HttpGet]
         public List<Article> List()
         {
-            return _articleStore.GetAll();
+            return _artickeServices.List();
         }
 
         [HttpPost]
         public ActionResult<Article> Create(Article article)
         {
-            if (article.UserName != null)
-            {
-                if (!UserStoreWillReplaceInFuture.Instance.GetAll().Exists(_ => article.UserName == _.Name))
-                {
-                    UserStoreWillReplaceInFuture.Instance.Save(new User(article.UserName));
-                }
 
-               _articleStore.Save(article);
-            }
-
-            //return article;
-            return new CreatedResult("/companies", article);
+            return new CreatedResult("/companies", _artickeServices.Create(article));
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle =
-                _articleStore.GetAll().FirstOrDefault(article => article.Id == id);
-            return foundArticle;
+            return _artickeServices.GetById(id);
         }
     }
 }
