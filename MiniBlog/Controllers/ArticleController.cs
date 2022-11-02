@@ -11,14 +11,10 @@
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
-        private IArticleStore _articleStore;
-        private IUserStore _userStore;
         private ArticleService articleService;
 
-        public ArticleController(IArticleStore _articleStore, IUserStore _userStore, ArticleService articleService)
+        public ArticleController(ArticleService articleService)
         {
-            this._articleStore = _articleStore;
-            this._userStore = _userStore;
             this.articleService = articleService;
         }
 
