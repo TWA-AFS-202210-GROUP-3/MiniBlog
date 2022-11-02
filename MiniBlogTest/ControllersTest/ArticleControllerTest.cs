@@ -14,10 +14,10 @@
     public class ArticleControllerTest
     {
         private IArticleStore articleStore = new ArticleStoreContext();
+        private IUserStore userStore = new UserStoreContext();
 
         public ArticleControllerTest()
         {
-            UserStoreWillReplaceInFuture.Instance.Init();
             articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
             articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }
@@ -96,7 +96,10 @@
             return factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureServices(services =>
-                services.AddSingleton(ServiceProvider => articleStore));
+                {
+                    services.AddSingleton(ServiceProvider => articleStore);
+                    services.AddSingleton(ServiceProvider => userStore);
+                });
             }).CreateClient();
         }
     }
