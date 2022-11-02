@@ -57,7 +57,15 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
-            var client = GetClient();
+            var userStoreMocker = new Mock<IUserStore>();
+            userStoreMocker.Setup(store => store.Save(It.IsAny<User>())).Throws<Exception>();
+            var factory = new WebApplicationFactory<Program>();
+            var client = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                    services.AddSingleton(ServiceProvider => userStoreMocker.Object));
+            }).CreateClient();
+
             var userName = "Tom";
             var email = "a@b.com";
             var user = new User(userName, email);
@@ -65,6 +73,7 @@ namespace MiniBlogTest.ControllerTest
 
             StringContent content = new StringContent(userJson, Encoding.UTF8, MediaTypeNames.Application.Json);
             var registerResponse = await client.PostAsync("/user", content);
+
             Assert.Equal(HttpStatusCode.InternalServerError, registerResponse.StatusCode);
         }
 

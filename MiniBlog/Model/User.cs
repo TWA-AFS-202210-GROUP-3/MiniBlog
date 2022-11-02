@@ -1,3 +1,5 @@
+using MiniBlog.Stores;
+
 namespace MiniBlog.Model
 {
     public class User
