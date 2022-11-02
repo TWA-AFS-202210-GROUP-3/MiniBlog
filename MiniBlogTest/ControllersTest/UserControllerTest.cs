@@ -53,7 +53,7 @@ namespace MiniBlogTest.ControllerTest
             Assert.Equal(userName, users[0].Name);
         }
 
-        [Fact(Skip = "todo: fix later")]
+        [Fact]
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
             var client = GetClient();

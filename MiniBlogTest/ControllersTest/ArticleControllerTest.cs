@@ -1,4 +1,7 @@
-﻿namespace MiniBlogTest.ControllerTest
+﻿using Microsoft.OpenApi.Any;
+using Moq;
+
+namespace MiniBlogTest.ControllerTest
 {
     using System.Net;
     using System.Net.Mime;
@@ -12,10 +15,12 @@
     [Collection("IntegrationTest")]
     public class ArticleControllerTest
     {
+        private IArticleStore articleStore = new ArticleStoreContext();
         public ArticleControllerTest()
         {
             UserStoreWillReplaceInFuture.Instance.Init();
-            ArticleStoreWillReplaceInFuture.Instance.Init();
+            articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
+            articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }
 
         [Fact]
@@ -29,10 +34,11 @@
             Assert.Equal(2, users.Count);
         }
 
-        [Fact(Skip = "fix later")]
+        [Fact]
         public async void Should_create_article_fail_when_ArticleStore_unavailable()
         {
-            var client = GetClient();
+            var client = MockArticleHttpClient();
+
             string userNameWhoWillAdd = "Tom";
             string articleContent = "What a good day today!";
             string articleTitle = "Good day";
@@ -43,6 +49,8 @@
             var response = await client.PostAsync("/article", content);
             Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         }
+
+
 
         [Fact]
         public async void Should_create_article_and_register_user_correct()
@@ -78,10 +86,24 @@
             Assert.Equal("anonymous@unknow.com", users[0].Email);
         }
 
-        private static HttpClient GetClient()
+        private HttpClient GetClient()
         {
             var factory = new WebApplicationFactory<Program>();
-            return factory.CreateClient();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleStore));
+            }).CreateClient();
+        }
+
+        private static HttpClient MockArticleHttpClient()
+        {
+            var articleStoreMock = new Mock<IArticleStore>();
+            articleStoreMock.Setup(store => store.Save(It.IsAny<Article>())).Throws<Exception>();
+            var factory = new WebApplicationFactory<Program>();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleStoreMock.Object));
+            }).CreateClient();
         }
     }
 }
