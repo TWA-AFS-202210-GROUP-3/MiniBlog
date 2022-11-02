@@ -12,14 +12,10 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
-        private readonly IArticleStore articleStore;
-        private readonly IUserStore userStore;
         private readonly IArticleService articleService;
 
-        public ArticleController(IArticleStore articleStore, IUserStore userStore, IArticleService articleService)
+        public ArticleController(IArticleService articleService)
         {
-            this.articleStore = articleStore;
-            this.userStore = userStore;
             this.articleService = articleService;
         }
 
@@ -32,17 +28,13 @@ namespace MiniBlog.Controllers
         [HttpPost]
         public ActionResult<Article> Create(Article article)
         {
-            
-
-            return new CreatedResult("/Arctile", article);
+            return new CreatedResult("/Arctile", this.articleService.Create(article));
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle =
-                this.articleStore.GetAll().FirstOrDefault(article => article.Id == id);
-            return foundArticle;
+            return this.articleService.GetById(id);
         }
     }
 }

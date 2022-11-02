@@ -35,6 +35,13 @@ namespace MiniBlog.Services
             return article;
         }
 
+        public Article GetById(Guid id)
+        {
+            var foundArticle =
+                this.articleStoreContext.GetAll().FirstOrDefault(article => article.Id == id);
+            return foundArticle;
+        }
+
         public bool Delete(Article article)
         {
             return this.articleStoreContext.Delete(article);

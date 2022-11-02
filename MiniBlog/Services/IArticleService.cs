@@ -7,7 +7,9 @@ public interface IArticleService
 {
     List<Article> List();
 
-    ActionResult<Article> Create(Article article);
+    Article Create(Article article);
 
-    bool Delete(Article article);
+    Article GetById(Guid id);
+
+    public bool Delete(Article article);
 }

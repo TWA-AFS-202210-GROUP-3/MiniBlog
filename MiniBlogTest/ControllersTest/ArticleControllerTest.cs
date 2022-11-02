@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Any;
+using MiniBlog.Services;
 using Moq;
 
 namespace MiniBlogTest.ControllerTest
@@ -16,11 +17,15 @@ namespace MiniBlogTest.ControllerTest
     public class ArticleControllerTest
     {
         private IArticleStore articleStore = new ArticleStoreContext();
+        private IUserStore userStore = new UserStoreContext();
+        private IArticleService articleService;
 
         public ArticleControllerTest()
         {
-            articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
-            articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
+            this.articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
+            this.articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
+            this.articleService = new ArticleService(this.articleStore, this.userStore);
+
         }
 
         [Fact]
@@ -91,18 +96,18 @@ namespace MiniBlogTest.ControllerTest
             var factory = new WebApplicationFactory<Program>();
             return factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleStore));
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleService));
             }).CreateClient();
         }
 
         private static HttpClient MockArticleHttpClient()
         {
-            var articleStoreMock = new Mock<IArticleStore>();
-            articleStoreMock.Setup(store => store.Save(It.IsAny<Article>())).Throws<Exception>();
+            var articleServiceMock = new Mock<IArticleService>();
+            articleServiceMock.Setup(store => store.Create(It.IsAny<Article>())).Throws<Exception>();
             var factory = new WebApplicationFactory<Program>();
             return factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleStoreMock.Object));
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => articleServiceMock.Object));
             }).CreateClient();
         }
     }
