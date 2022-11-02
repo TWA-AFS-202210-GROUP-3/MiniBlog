@@ -6,10 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IArticleStore, ArticleStoreContext>();
 builder.Services.AddSingleton<IUserStore, UserStoreContext>();
+builder.Services.AddSingleton<ArticalService>();
 /// <summary>
 /// 需要IArticleStore的时候，给一个ArticleStoreContext，且是Singleton的
 /// </summary>
-/// 
+///
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

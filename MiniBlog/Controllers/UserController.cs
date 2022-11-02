@@ -8,24 +8,25 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private IArticleStore articleStore;
-        private IUserStore userStore;
+        private UserService userService;
 
-        public UserController(IUserStore userStore, IArticleStore articleStore)
+        public UserController(UserService userService)
         {
-            this.userStore = userStore;
-            this.articleStore = articleStore;
+            this.userService = userService;
         }
 
         [HttpPost]
         public ActionResult<User> Register(User user)
         {
-            if (!userStore.GetAll().Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
-            {
-                userStore.Save(user);
-            }
+            user = this.userService.Register(user);
 
-            return new CreatedResult($"/users/{user.Name}", user);
+            return new CreatedResult($"/Article/{user.Name}", user);
+            //if (!userStore.GetAll().Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
+            //{
+            //    userStore.Save(user);
+            //}
+
+            //return new CreatedResult($"/users/{user.Name}", user);
         }
 
         [HttpGet]
