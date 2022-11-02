@@ -6,6 +6,7 @@ namespace MiniBlogTest.ControllerTest
     using Microsoft.AspNetCore.Mvc.Testing;
     using MiniBlog.Model;
     using MiniBlog.Stores;
+    using Moq;
     using Newtonsoft.Json;
     using Xunit;
 
@@ -57,7 +58,6 @@ namespace MiniBlogTest.ControllerTest
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
             var client = GetClient();
-
             var userName = "Tom";
             var email = "a@b.com";
             var user = new User(userName, email);

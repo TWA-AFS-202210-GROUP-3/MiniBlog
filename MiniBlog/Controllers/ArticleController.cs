@@ -10,6 +10,13 @@
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
+        private IArticleStore _articleStore;
+
+        public ArticleController(IArticleStore _articleStore)
+        {
+            this._articleStore = _articleStore;
+        }
+
         [HttpGet]
         public List<Article> List()
         {
@@ -26,7 +33,7 @@
                     UserStoreWillReplaceInFuture.Instance.Save(new User(article.UserName));
                 }
 
-                ArticleStoreWillReplaceInFuture.Instance.Save(article);
+                _articleStore.Save(article);
             }
 
             return new CreatedResult("/article", article);
