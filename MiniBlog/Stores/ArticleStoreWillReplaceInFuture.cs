@@ -2,7 +2,7 @@ namespace MiniBlog.Stores
 {
     using MiniBlog.Model;
 
-    public class ArticleStoreWillReplaceInFuture
+    public class ArticleStoreWillReplaceInFuture : IArticleStore
     {
         private List<Article> articles;
 
@@ -28,7 +28,7 @@ namespace MiniBlog.Stores
         {
             return this.articles.Remove(articles);
         }
-        
+
         /// <summary>
         /// This is for test only, please help resolve!
         /// </summary>
