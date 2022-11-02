@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IArticleStore, ArticleStoreContext>();
+builder.Services.AddSingleton<IUserStore, UserStoreContext>();
 /// <summary>
 /// 需要IArticleStore的时候，给一个ArticleStoreContext，且是Singleton的
 /// </summary>
