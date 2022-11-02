@@ -27,5 +27,10 @@ namespace MiniBlog.Service
             }
             return article;
         }
+
+        public List<Article> GetAllArticles()
+        {
+            return _articleStore.GetAll();
+        }
     }
 }

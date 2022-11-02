@@ -25,7 +25,7 @@
         [HttpGet]
         public List<Article> List()
         {
-            return _articleStore.GetAll();
+            return articleService.GetAllArticles();
         }
 
         [HttpPost]
