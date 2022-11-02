@@ -10,14 +10,22 @@
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
+        // dependency injection
+        private readonly IArticleStore _articleStore;
+
+        public ArticleController(IArticleStore articleStore)
+        {
+            this._articleStore = articleStore;
+        }
+
         [HttpGet]
         public List<Article> List()
         {
-            return ArticleStoreWillReplaceInFuture.Instance.GetAll();
+            return _articleStore.GetAll();
         }
 
         [HttpPost]
-        public Article Create(Article article)
+        public ActionResult<Article> Create(Article article)
         {
             if (article.UserName != null)
             {
@@ -26,17 +34,18 @@
                     UserStoreWillReplaceInFuture.Instance.Save(new User(article.UserName));
                 }
 
-                ArticleStoreWillReplaceInFuture.Instance.Save(article);
+               _articleStore.Save(article);
             }
 
-            return article;
+            //return article;
+            return new CreatedResult("/companies", article);
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
             var foundArticle =
-                ArticleStoreWillReplaceInFuture.Instance.GetAll().FirstOrDefault(article => article.Id == id);
+                _articleStore.GetAll().FirstOrDefault(article => article.Id == id);
             return foundArticle;
         }
     }
