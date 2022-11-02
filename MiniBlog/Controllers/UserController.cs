@@ -40,17 +40,7 @@ namespace MiniBlog.Controllers
         [HttpDelete]
         public User Delete(string name)
         {
-            var foundUser = _userStore.GetAll().FirstOrDefault(_ => _.Name == name);
-            if (foundUser != null)
-            {
-                _userStore.Delete(foundUser);
-                var articles = _articleStore.GetAll()
-                    .Where(article => article.UserName == foundUser.Name)
-                    .ToList();
-                articles.ForEach(article => _articleStore.Delete(article));
-            }
-
-            return foundUser;
+            return userService.DeleteUser(name);
         }
 
         [HttpGet("{name}")]

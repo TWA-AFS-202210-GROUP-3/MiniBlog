@@ -9,10 +9,10 @@ namespace MiniBlog.Service
         private IArticleStore _articleStore;
         private IUserStore _userStore;
 
-        public UserService(IArticleStore _articleStore, IUserStore userStore)
+        public UserService(IArticleStore _articleStore, IUserStore _userStore)
         {
             this._articleStore = _articleStore;
-            _userStore = userStore;
+            this._userStore = _userStore;
         }
 
         public User RegisterUser(User user)
@@ -36,6 +36,21 @@ namespace MiniBlog.Service
             if (foundUser != null)
             {
                 foundUser.Email = user.Email;
+            }
+
+            return foundUser;
+        }
+
+        public User DeleteUser(string name)
+        {
+            var foundUser = _userStore.GetAll().FirstOrDefault(_ => _.Name == name);
+            if (foundUser != null)
+            {
+                _userStore.Delete(foundUser);
+                var articles = _articleStore.GetAll()
+                    .Where(article => article.UserName == foundUser.Name)
+                    .ToList();
+                articles.ForEach(article => _articleStore.Delete(article));
             }
 
             return foundUser;
