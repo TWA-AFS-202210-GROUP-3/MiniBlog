@@ -6,18 +6,22 @@ namespace MiniBlogTest.ControllerTest
     using Microsoft.AspNetCore.Mvc.Testing;
     using MiniBlog.Model;
     using MiniBlog.Stores;
+    using Moq;
     using Newtonsoft.Json;
     using Xunit;
 
     [Collection("IntegrationTest")]
     public class UserControllerTest
     {
+        private IArticleStore articleStore = new ArticleStoreContext();
+        private IUserStore userStore = new UserStoreContext();
+
         public UserControllerTest()
             : base()
 
         {
-            UserStoreWillReplaceInFuture.Instance.Init();
-            ArticleStoreWillReplaceInFuture.Instance.Init();
+            articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
+            articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }
 
         [Fact]
@@ -56,7 +60,21 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
-            var client = GetClient();
+            var articleStoreMocker = new Mock<IArticleStore>();
+            articleStoreMocker.Setup(store => store.Save(It.IsAny<Article>())).Throws<Exception>();
+
+            var userStoreMocker = new Mock<IUserStore>();
+            userStoreMocker.Setup(store => store.Save(It.IsAny<User>())).Throws<Exception>();
+
+            var factory = new WebApplicationFactory<Program>();
+            var client = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    services.AddSingleton(ServiceProvider => articleStoreMocker.Object);
+                    services.AddSingleton(ServiceProvider => userStoreMocker.Object);
+                });
+            }).CreateClient();
 
             var userName = "Tom";
             var email = "a@b.com";
@@ -141,10 +159,17 @@ namespace MiniBlogTest.ControllerTest
             await client.PostAsync("/article", registerUserContent);
         }
 
-        private static HttpClient GetClient()
+        private HttpClient GetClient()
         {
             var factory = new WebApplicationFactory<Program>();
-            return factory.CreateClient();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    services.AddSingleton(ServiceProvider => articleStore);
+                    services.AddSingleton(ServiceProvider => userStore);
+                });
+            }).CreateClient();
         }
     }
 }
