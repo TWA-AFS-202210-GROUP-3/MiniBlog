@@ -10,33 +10,33 @@
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
+        private ArticalService articalService;
+
+        public ArticleController(ArticalService articalService)
+        {
+            this.articalService = articalService;
+        }
+
         [HttpGet]
         public List<Article> List()
         {
-            return ArticleStoreWillReplaceInFuture.Instance.GetAll();
+            List<Article> all = this.articalService.List();
+            return all;
         }
 
         [HttpPost]
-        public Article Create(Article article)
+        public ActionResult<Article> Create(Article article)
         {
-            if (article.UserName != null)
-            {
-                if (!UserStoreWillReplaceInFuture.Instance.GetAll().Exists(_ => article.UserName == _.Name))
-                {
-                    UserStoreWillReplaceInFuture.Instance.Save(new User(article.UserName));
-                }
+            article = this.articalService.Create(article);
 
-                ArticleStoreWillReplaceInFuture.Instance.Save(article);
-            }
-
-            return article;
+            return new CreatedResult("/Article", article);
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle =
-                ArticleStoreWillReplaceInFuture.Instance.GetAll().FirstOrDefault(article => article.Id == id);
+            Article foundArticle = this.articalService.GetById(id);
+
             return foundArticle;
         }
     }

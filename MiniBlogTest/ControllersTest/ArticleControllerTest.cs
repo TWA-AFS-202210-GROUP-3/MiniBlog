@@ -1,4 +1,6 @@
-﻿namespace MiniBlogTest.ControllerTest
+﻿using Moq;
+
+namespace MiniBlogTest.ControllerTest
 {
     using System.Net;
     using System.Net.Mime;
@@ -12,10 +14,13 @@
     [Collection("IntegrationTest")]
     public class ArticleControllerTest
     {
+        private IArticleStore articleStore = new ArticleStoreContext();
+
         public ArticleControllerTest()
         {
             UserStoreWillReplaceInFuture.Instance.Init();
-            ArticleStoreWillReplaceInFuture.Instance.Init();
+            articleStore.Save(new Article(null, "Happy new year", "Happy 2021 new year"));
+            articleStore.Save(new Article(null, "Happy Halloween", "Halloween is coming"));
         }
 
         [Fact]
@@ -32,7 +37,14 @@
         [Fact]
         public async void Should_create_article_fail_when_ArticleStore_unavailable()
         {
-            var client = GetClient();
+            var articleStoreMOcker = new Mock<IArticleStore>();
+            articleStoreMOcker.Setup(x => x.Save(It.IsAny<Article>())).Throws<Exception>();
+            var factory = new WebApplicationFactory<Program>();
+            var client = factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service =>
+                    service.AddSingleton(serviceProvider => articleStoreMOcker.Object));
+            }).CreateClient();
             string userNameWhoWillAdd = "Tom";
             string articleContent = "What a good day today!";
             string articleTitle = "Good day";
@@ -47,7 +59,6 @@
         [Fact]
         public async void Should_create_article_and_register_user_correct()
         {
-            GetClient();
             var client = GetClient();
             string userNameWhoWillAdd = "Tom";
             string articleContent = "What a good day today!";
@@ -78,10 +89,15 @@
             Assert.Equal("anonymous@unknow.com", users[0].Email);
         }
 
-        private static HttpClient GetClient()
+        private HttpClient GetClient()
         {
             var factory = new WebApplicationFactory<Program>();
-            return factory.CreateClient();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service =>
+                    service.AddSingleton(serviceProvider => articleStore));
+            }).CreateClient();
+            ///使用的是注入的articlestore
         }
     }
 }
