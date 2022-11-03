@@ -1,3 +1,5 @@
+using Moq;
+
 namespace MiniBlogTest.ControllerTest
 {
     using System.Net;
@@ -16,8 +18,6 @@ namespace MiniBlogTest.ControllerTest
             : base()
 
         {
-            UserStoreWillReplaceInFuture.Instance.Init();
-            ArticleStoreWillReplaceInFuture.Instance.Init();
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
-            var client = GetClient();
+            var client = MockArticleHttpClient();
 
             var userName = "Tom";
             var email = "a@b.com";
@@ -104,7 +104,7 @@ namespace MiniBlogTest.ControllerTest
             await PrepareArticle(new Article(userName, string.Empty, string.Empty), client);
 
             var articles = await GetArticles(client);
-            Assert.Equal(4, articles.Count);
+            Assert.Equal(2, articles.Count);
 
             var users = await GetUsers(client);
             Assert.Equal(1, users.Count);
@@ -112,7 +112,7 @@ namespace MiniBlogTest.ControllerTest
             await client.DeleteAsync($"/user?name={userName}");
 
             var articlesAfterDeleteUser = await GetArticles(client);
-            Assert.Equal(2, articlesAfterDeleteUser.Count);
+            Assert.Equal(0, articlesAfterDeleteUser.Count);
 
             var usersAfterDeleteUser = await GetUsers(client);
             Assert.Equal(0, usersAfterDeleteUser.Count);
@@ -145,6 +145,17 @@ namespace MiniBlogTest.ControllerTest
         {
             var factory = new WebApplicationFactory<Program>();
             return factory.CreateClient();
+        }
+
+        private static HttpClient MockArticleHttpClient()
+        {
+            var userStoreMock = new Mock<IUserStore>();
+            userStoreMock.Setup(store => store.Save(It.IsAny<User>())).Throws<Exception>();
+            var factory = new WebApplicationFactory<Program>();
+            return factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(service => service.AddSingleton(serviceProvider => userStoreMock.Object));
+            }).CreateClient();
         }
     }
 }
